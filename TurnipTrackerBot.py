@@ -87,7 +87,7 @@ async def parse_message(message):
             delete_entry(t)
         await save_data_local(t)
         await save_data_google_sheets(t)
-        await message.channel.send('Thanks {}! Your turnip price has been saved! \n**Price** : {} \t**Period**: {} \t**Date**: {}'.format(message.author.name, t.price, t.period, t.date))
+        await message.channel.send('Thanks, {}! Your turnip price has been saved! \n**Price** : {} \t**Period**: {} \t**Date**: {}'.format(message.author.name, t.price, t.period, t.date))
         await react_to_complete_message(message)
 
 # After parsing the message use this helper method to save the data to the dictionary which lives in memory and the google sheet
