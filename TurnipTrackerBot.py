@@ -55,7 +55,7 @@ class TurnipPrice:
         elif "pm" in self.string:
             return "PM"
         else:
-            raise ValueError("No period found in command string")
+            return datetime.datetime.today().strftime("%p") # if the user doesn't specify assume the current period
 
     def extract_flags(self):
         return re.findall(r'--\w+', self.string)
