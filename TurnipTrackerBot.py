@@ -46,8 +46,9 @@ def extract_date(string):
     
 def extract_price(string):
     try:
-        price = re.findall(r'([^\/]\d+[^\/])', string)[0]
-        return price
+        price = re.findall(r'( \d+ | \d+$)', string)[0]
+        print(price)
+        return int(price)
     except:
         raise ValueError("Malformed command string")
     
