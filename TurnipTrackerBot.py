@@ -28,40 +28,39 @@ class TurnipPrice:
     def __init__(self, message):
         self.message = message
         self.string = message.content.lower()
-        self.price = self.extract_price()
-        self.period = self.extract_period()
-        self.date = self.extract_date()
+        self.price = extract_price(self.string)
+        self.period = extract_period(self.string)
+        self.date = extract_date(self.string)
         self.user = message.author.name
-        self.flags = self.extract_flags()
-    
-    # helper method using regex to extract the date from a given string. Date must have a '/' seperating month, date, and year
-    def extract_date(self):
-        try:
-            date = re.findall(r'\d+/\d+/\d+|\d+/\d+', self.string)[0]
-            return date
-        except:
-            return datetime.date.today().strftime("%m/%d/%y")
-    
-    def extract_price(self):
-        try:
-            price = re.findall(r'([^\/]\d+[^\/])', self.string)[0]
-            return price
-        except:
-            raise ValueError("Malformed command string")
-    
-    def extract_period(self):
-        if "am" in self.string:
-            return "AM"
-        elif "pm" in self.string:
-            return "PM"
-        else:
-            return datetime.datetime.today().strftime("%p") # if the user doesn't specify assume the current period
-
-    def extract_flags(self):
-        return re.findall(r'--\w+', self.string)
-            
+        self.flags = extract_flags(self.string)
+                
     def make_row(self):
         return [str(self.user), str(self.price), str(self.period), str(self.date)]
+# helper method using regex to extract the date from a given string. Date must have a '/' seperating month, date, and year
+def extract_date(string):
+    try:
+        date = re.findall(r'\d+/\d+/\d+|\d+/\d+', string)[0]
+        return date
+    except:
+        return datetime.date.today().strftime("%m/%d/%y")
+    
+def extract_price(string):
+    try:
+        price = re.findall(r'([^\/]\d+[^\/])', string)[0]
+        return price
+    except:
+        raise ValueError("Malformed command string")
+    
+def extract_period(string):
+    if "am" in string:
+        return "AM"
+    elif "pm" in string:
+        return "PM"
+    else:
+        return datetime.datetime.today().strftime("%p") # if the user doesn't specify assume the current period
+
+def extract_flags(string):
+    return re.findall(r'--\w+', string)
 
 # This method is triggered when we log in. 
 @client.event
@@ -89,6 +88,7 @@ async def parse_message(message):
         await save_data_google_sheets(t)
         await message.channel.send('Thanks, {}! Your turnip price has been saved! \n**Price** : {} \t**Period**: {} \t**Date**: {}'.format(message.author.name, t.price, t.period, t.date))
         await react_to_complete_message(message)
+        return t
 
 # After parsing the message use this helper method to save the data to the dictionary which lives in memory and the google sheet
 async def save_data_local(turnip_price: TurnipPrice):
@@ -119,6 +119,9 @@ def find_entry(turnip: TurnipPrice):
     for row in all_values:
         if(row[0] == turnip.user and row[1] == turnip.price and row[2] == turnip.period and row[3] == turnip.date):
             print("Found row to match value")
+
+def make_greeting():
+    pass
 
 
 # After we have saved the data given in a user's message, react to it to provide feedback
