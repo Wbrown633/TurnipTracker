@@ -81,6 +81,8 @@ async def parse_message(message):
     message_str = message.content.lower()
     if 'help' in message_str:
         await message.channel.send('Thanks for asking! Please submit turnip requests using the following format: `$turnip [price] [AM/PM] [OPTIONAL Date: MM/DD/YY]`')
+    elif 'status' in message_str or "suh_dude" in message_str:
+        await message.channel.send('Ready and wating for your Turnip prices, {}!!'.format(message.author.name))
     else:
         t = TurnipPrice(message)
         if "--delete" in t.flags:
