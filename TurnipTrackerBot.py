@@ -13,7 +13,7 @@ client = discord.Client()
 directory = os.getcwd()
 scope = ['https://spreadsheets.google.com/feeds',
         'https://www.googleapis.com/auth/drive']
-creds = ServiceAccountCredentials.from_json_keyfile_name(directory + '\\client_secret.json', scope)
+creds = ServiceAccountCredentials.from_json_keyfile_name(directory + '/client_secret.json', scope)
 gclient = gspread.authorize(creds)
 list_of_turnip_prices = []
 sheet = gclient.open("Turniphead's Turnip Tracker").sheet1
@@ -24,7 +24,7 @@ class TurnipPrice:
     price: int
     period: str
     date: str
-    
+
     def __init__(self, message):
         self.message = message
         self.string = message.content.lower()
@@ -33,7 +33,7 @@ class TurnipPrice:
         self.date = extract_date(self.string)
         self.user = message.author.name
         self.flags = extract_flags(self.string)
-                
+
     def make_row(self):
         return [str(self.user), str(self.price), str(self.period), str(self.date)]
 # helper method using regex to extract the date from a given string. Date must have a '/' seperating month, date, and year
@@ -43,7 +43,7 @@ def extract_date(string):
         return date
     except:
         return datetime.date.today().strftime("%m/%d/%y")
-    
+
 def extract_price(string):
     try:
         price = re.findall(r'( \d+ | \d+$)', string)[0]
@@ -51,7 +51,7 @@ def extract_price(string):
         return int(price)
     except:
         raise ValueError("Malformed command string")
-    
+
 def extract_period(string):
     if "am" in string:
         return "AM"
@@ -63,7 +63,7 @@ def extract_period(string):
 def extract_flags(string):
     return re.findall(r'--\w+', string)
 
-# This method is triggered when we log in. 
+# This method is triggered when we log in.
 @client.event
 async def on_ready():
     print('Logged in as {0.user}'.format(client))
