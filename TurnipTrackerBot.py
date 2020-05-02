@@ -7,6 +7,7 @@ import os
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from dataclasses import dataclass
+import argparse
 
 client = discord.Client()
 
@@ -50,7 +51,7 @@ def extract_price(string):
         print(price)
         return int(price)
     except:
-        raise ValueError("Malformed command string")
+        return None
     
 def extract_period(string):
     if "am" in string:
@@ -79,14 +80,21 @@ async def on_message(message):
 # First of a few helper methods to parse messages posted in the server
 async def parse_message(message):
     message_str = message.content.lower()
+    t = TurnipPrice(message)
     if 'help' in message_str:
         await message.channel.send('Thanks for asking! Please submit turnip requests using the following format: `$turnip [price] [AM/PM] [OPTIONAL Date: MM/DD/YY]`')
     elif 'status' in message_str or "suh_dude" in message_str:
         await message.channel.send('Ready and wating for your Turnip prices, {}!!'.format(message.author.name))
-    else:
-        t = TurnipPrice(message)
-        if "--delete" in t.flags:
-            delete_entry(t)
+    elif "--delete" in t.flags:
+        await delete_entry(t)
+    elif "--debug" in t.flags:
+        global sheet 
+        sheet = gclient.open("Turniphead's Turnip Tracker").worksheet("debug")
+        await message.channel.send('Sheet set to debug sheet.')
+    elif "--master" in t.flags:
+        sheet = gclient.open("Turniphead's Turnip Tracker").sheet1
+        await message.channel.send('Sheet set to sheet1.')
+    else:    
         await save_data_local(t)
         await save_data_google_sheets(t)
         await message.channel.send('Thanks, {}! Your turnip price has been saved! \n**Price** : {} \t**Period**: {} \t**Date**: {}'.format(message.author.name, t.price, t.period, t.date))
@@ -119,8 +127,10 @@ async def delete_entry(turnip: TurnipPrice):
 
 def find_entry(turnip: TurnipPrice):
     all_values = sheet.get_all_values()
+    print(turnip.user, turnip.price, turnip.period, turnip.date)
     for row in all_values:
-        if(row[0] == turnip.user and row[1] == turnip.price and row[2] == turnip.period and row[3] == turnip.date):
+        print(row)
+        if(row[0] == turnip.user and row[1] == str(turnip.price) and row[2] == turnip.period and row[3] == str(turnip.date)):
             print("Found row to match value")
 
 def make_greeting():
