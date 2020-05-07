@@ -22,21 +22,28 @@ sheet = gclient.open("Turniphead's Turnip Tracker").sheet1
 @dataclass
 class TurnipPrice:
     '''Class for keeping track of a turnip price.'''
+    message: discord.Message
+    channel: discord.TextChannel
+    author: str
+    string: str
     price: int
     period: str
     date: str
+    user: str
+    flags: list
 
     def __init__(self, message):
         self.message = message
+        self.channel = message.channel
+        self.author = message.author.name
         self.string = message.content.lower()
         self.price = extract_price(self.string)
         self.period = extract_period(self.string)
         self.date = extract_date(self.string)
         self.user = message.author.name
-        self.flags = extract_flags(self.string)
-
     def make_row(self):
         return [str(self.user), str(self.price), str(self.period), str(self.date)]
+
 # helper method using regex to extract the date from a given string. Date must have a '/' seperating month, date, and year
 def extract_date(string):
     try:
@@ -61,9 +68,6 @@ def extract_period(string):
     else:
         return datetime.datetime.today().strftime("%p") # if the user doesn't specify assume the current period
 
-def extract_flags(string):
-    return re.findall(r'--\w+', string)
-
 # This method is triggered when we log in.
 @client.event
 async def on_ready():
@@ -75,35 +79,59 @@ async def on_message(message):
     if message.author == client.user:
         return
     if message.content.startswith('$turnip'):
+        message.content = message.content.lower().replace("$turnip", "")
         await parse_message(message)
 
 # First of a few helper methods to parse messages posted in the server
 async def parse_message(message):
     message_str = message.content.lower()
     t = TurnipPrice(message)
+    args = parse_args(message_str.split(" "))
     if 'help' in message_str:
-        await message.channel.send('Thanks for asking! Please submit turnip requests using the following format: `$turnip [price] [AM/PM] [OPTIONAL Date: MM/DD/YY]`')
+        await t.channel.send('Thanks for asking! Please submit turnip requests using the following format: `$turnip [price] [AM/PM] [OPTIONAL Date: MM/DD/YY]`')
     elif 'status' in message_str or "suh_dude" in message_str:
-        await message.channel.send('Ready and wating for your Turnip prices, {}!!'.format(message.author.name))
-    elif "--delete" in t.flags:
+        await t.channel.send('Ready and wating for your Turnip prices, {}!!'.format(t.author))
+    elif args.delete:
         await delete_entry(t)
-    elif "--debug" in t.flags:
+    elif args.debug:
         global sheet 
         sheet = gclient.open("Turniphead's Turnip Tracker").worksheet("debug")
-        await message.channel.send('Sheet set to debug sheet.')
-    elif "--master" in t.flags:
+        await t.channel.send('Sheet set to debug sheet.')
+    elif args.master:
         sheet = gclient.open("Turniphead's Turnip Tracker").sheet1
-        await message.channel.send('Sheet set to sheet1.')
-    else:    
-        await save_data_local(t)
-        await save_data_google_sheets(t)
-        await message.channel.send('Thanks, {}! Your turnip price has been saved! \n**Price** : {} \t**Period**: {} \t**Date**: {}'.format(message.author.name, t.price, t.period, t.date))
-        await react_to_complete_message(message)
+        await t.channel.send('Sheet set to sheet1.')
+    elif args.user:
+        t.user = args.user
+        await save_data(t)
+    else:
+        print(t)    
+        await save_data(t)
         return t
 
 # After parsing the message use this helper method to save the data to the dictionary which lives in memory and the google sheet
 async def save_data_local(turnip_price: TurnipPrice):
     list_of_turnip_prices.append(turnip_price)
+
+async def save_data(t: TurnipPrice):
+    await save_data_local(t)
+    await save_data_google_sheets(t)
+    if t.user:
+        await t.channel.send(f'Thanks, {t.author}! Your turnip price has been saved as user {t.user}! \n**Price** : {t.price} \t**Period**: {t.period} \t**Date**: {t.date}')  
+    else:
+        await t.channel.send(f'Thanks, {t.author}! Your turnip price has been saved! \n**Price** : {t.price} \t**Period**: {t.period} \t**Date**: {t.date}')
+    await react_to_complete_message(t.message)
+    return t
+
+def parse_args(message_string):
+    parser = argparse.ArgumentParser()
+    parser.add_argument("price", default= 0, nargs="*", help="the price of the turnips as")
+    parser.add_argument("--user", action="store", help="allow turnip prices to be added as a different user")
+    parser.add_argument("--edit", action="store_true", help="allow user to edit an entry")
+    parser.add_argument("--delete", action="store_true", help="allow user to delete an entry")
+    parser.add_argument("--debug", action="store_true", help="set the sheet to the debug sheet")
+    parser.add_argument("--master", action="store_true", help="set the sheet to the master sheet")
+    parser.add_argument("--status", action="store_true", help="display a status message to the user")
+    return parser.parse_args(message_string)
 
 # Inserts the data into the 2nd row of the sheet, pushes all other rows down as a result
 async def save_data_google_sheets(turnip_price: TurnipPrice):
@@ -135,6 +163,7 @@ def find_entry(turnip: TurnipPrice):
 
 def make_greeting():
     pass
+
 
 
 # After we have saved the data given in a user's message, react to it to provide feedback
