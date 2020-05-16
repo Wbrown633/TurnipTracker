@@ -114,7 +114,7 @@ async def save_data_local(turnip_price: TurnipPrice):
 async def save_data(t: TurnipPrice):
     await save_data_local(t)
     await save_data_google_sheets(t)
-    if t.user:
+    if t.user != t.author:
         await t.channel.send(f'Thanks, {t.author}! Your turnip price has been saved as user {t.user}! \n**Price** : {t.price} \t**Period**: {t.period} \t**Date**: {t.date}')  
     else:
         await t.channel.send(f'Thanks, {t.author}! Your turnip price has been saved! \n**Price** : {t.price} \t**Period**: {t.period} \t**Date**: {t.date}')
