@@ -61,9 +61,9 @@ def extract_price(string):
         return None
     
 def extract_period(string):
-    if "am" in string:
+    if " am " in string:
         return "AM"
-    elif "pm" in string:
+    elif " pm " in string:
         return "PM"
     else:
         return datetime.datetime.today().strftime("%p") # if the user doesn't specify assume the current period
