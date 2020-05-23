@@ -14,7 +14,8 @@ client = discord.Client()
 directory = os.getcwd()
 scope = ['https://spreadsheets.google.com/feeds',
         'https://www.googleapis.com/auth/drive']
-creds = ServiceAccountCredentials.from_json_keyfile_name(directory + '/client_secret.json', scope)
+creds = ServiceAccountCredentials.from_json_keyfile_name(directory +
+'/client_secret.json', scope)
 gclient = gspread.authorize(creds)
 list_of_turnip_prices = []
 sheet = gclient.open("Turniphead's Turnip Tracker").sheet1
@@ -59,7 +60,7 @@ def extract_price(string):
         return int(price)
     except:
         return None
-    
+
 def extract_period(string):
     if " am " in string:
         return "AM"
@@ -94,7 +95,7 @@ async def parse_message(message):
     elif args.delete:
         await delete_entry(t)
     elif args.debug:
-        global sheet 
+        global sheet
         sheet = gclient.open("Turniphead's Turnip Tracker").worksheet("debug")
         await t.channel.send('Sheet set to debug sheet.')
     elif args.master:
@@ -103,7 +104,7 @@ async def parse_message(message):
     elif args.user:
         t.user = args.user
         await save_data(t)
-    else:    
+    else:
         await save_data(t)
         return t
 
@@ -115,7 +116,7 @@ async def save_data(t: TurnipPrice):
     await save_data_local(t)
     await save_data_google_sheets(t)
     if t.user != t.author:
-        await t.channel.send(f'Thanks, {t.author}! Your turnip price has been saved as user {t.user}! \n**Price** : {t.price} \t**Period**: {t.period} \t**Date**: {t.date}')  
+        await t.channel.send(f'Thanks, {t.author}! Your turnip price has been saved as user {t.user}! \n**Price** : {t.price} \t**Period**: {t.period} \t**Date**: {t.date}')
     else:
         await t.channel.send(f'Thanks, {t.author}! Your turnip price has been saved! \n**Price** : {t.price} \t**Period**: {t.period} \t**Date**: {t.date}')
     await react_to_complete_message(t.message)
