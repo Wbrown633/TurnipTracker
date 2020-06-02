@@ -65,16 +65,15 @@ def extract_date(string):
 def extract_price(string):
     try:
         price = re.findall(r"( \d+ | \d+$)", string)[0]
-        print(price)
         return int(price)
     except:
         return None
 
 
 def extract_period(string):
-    if " am " in string:
+    if " am " in string or " am" in string:
         return "AM"
-    elif " pm " in string:
+    elif " pm " in string or " pm" in string:
         return "PM"
     else:
         return datetime.datetime.today().strftime(
@@ -109,7 +108,7 @@ async def parse_message(message):
             "following format: `$turnip [price] [AM/PM]"
             "[OPTIONAL Date: MM/DD/YY]`"
         )
-    elif "status" in message_str or "suh_dude" in message_str:
+    elif args.status or args.suh_dude:
         await t.channel.send(
             "Ready and waiting for your Turnip prices, {}!!".format(t.author)
         )
@@ -188,6 +187,12 @@ def parse_args(message_string):
     )
     parser.add_argument(
         "--status",
+        action="store_true",
+        help="display a status message to the\
+        user",
+    )
+    parser.add_argument(
+        "--suh_dude",
         action="store_true",
         help="display a status message to the\
         user",
