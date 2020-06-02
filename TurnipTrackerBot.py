@@ -230,15 +230,10 @@ async def delete_entry(turnip: TurnipPrice):
 
 def find_entry(turnip: TurnipPrice):
     all_values = sheet.get_all_values()
-    print(turnip.user, turnip.price, turnip.period, turnip.date)
+    print(f"Listing values for user: {turnip.user}")
     for row in all_values:
         print(row)
-        if (
-            row[0] == turnip.user
-            and row[1] == str(turnip.price)
-            and row[2] == turnip.period
-            and row[3] == str(turnip.date)
-        ):
+        if row[0] == turnip.user:
             print("Found row to match value")
 
 
