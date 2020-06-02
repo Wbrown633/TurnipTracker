@@ -136,6 +136,8 @@ async def save_data_local(turnip_price: TurnipPrice):
 
 
 async def save_data(t: TurnipPrice):
+    if t.price == None:
+        break
     await save_data_local(t)
     await save_data_google_sheets(t)
     if t.user != t.author:
