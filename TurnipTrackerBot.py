@@ -232,9 +232,8 @@ def find_entry(turnip: TurnipPrice):
     all_values = sheet.get_all_values()
     print(f"Listing values for user: {turnip.user}")
     for row in all_values:
-        print(row)
         if row[0] == turnip.user:
-            print("Found row to match value")
+            print(row)
 
 
 def make_greeting():
