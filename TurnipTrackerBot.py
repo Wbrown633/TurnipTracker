@@ -124,6 +124,8 @@ async def parse_message(message):
     elif args.user:
         t.user = args.user
         await save_data(t)
+    elif args.log:
+        await find_entry(t)
     else:
         await save_data(t)
         return t
