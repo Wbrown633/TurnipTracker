@@ -110,7 +110,7 @@ async def parse_message(message):
         )
         return t
     if args.user:
-        t.user = args.user
+        t.user = args.user.capitalize()
     if args.status or args.suh_dude:
         await t.channel.send(
             "Ready and waiting for your Turnip prices, {}!!".format(t.author)
@@ -237,7 +237,7 @@ def find_entry(turnip: TurnipPrice):
     all_values = sheet.get_all_values()
     print(f"Listing values for user: {turnip.user}")
     for row in all_values:
-        if row[0] == turnip.user:
+        if row[0].lower() == turnip.user.lower():
             print(row)
 
 
