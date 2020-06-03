@@ -150,7 +150,7 @@ async def save_data(t: TurnipPrice):
     if t.user != t.author:
         await t.channel.send(
             (
-                f"Thanks, {t.author}! Your turnip price has been saved as user"
+                f"Thanks, {t.author}! Your turnip price has been saved as user "
                 f"{t.user}! \n**Price** : {t.price} \t**Period**: {t.period}"
                 f"\t**Date**: {t.date}"
             )
