@@ -109,9 +109,9 @@ async def parse_message(message):
             "[OPTIONAL Date: MM/DD/YY]`"
         )
         return t
-    elif args.user:
+    if args.user:
         t.user = args.user
-    elif args.status or args.suh_dude:
+    if args.status or args.suh_dude:
         await t.channel.send(
             "Ready and waiting for your Turnip prices, {}!!".format(t.author)
         )
