@@ -108,27 +108,32 @@ async def parse_message(message):
             "following format: `$turnip [price] [AM/PM]"
             "[OPTIONAL Date: MM/DD/YY]`"
         )
+        return t
+    elif args.user:
+        t.user = args.user
     elif args.status or args.suh_dude:
         await t.channel.send(
             "Ready and waiting for your Turnip prices, {}!!".format(t.author)
         )
+        return t
     elif args.delete:
         await delete_entry(t)
+        return t
     elif args.debug:
         global sheet
         sheet = gclient.open("Turniphead's Turnip Tracker").worksheet("debug")
         await t.channel.send("Sheet set to debug sheet.")
+        return t
     elif args.master:
         sheet = gclient.open("Turniphead's Turnip Tracker").sheet1
         await t.channel.send("Sheet set to sheet1.")
-    elif args.user:
-        t.user = args.user
-        await save_data(t)
-    elif args.log:
-        await find_entry(t)
-    else:
-        await save_data(t)
         return t
+    elif args.log:
+        find_entry(t)
+        return t
+    # If we haven't broken by now we're a normal price
+    await save_data(t)
+    return t
 
 
 # After parsing the message use this helper method to save the data to the
