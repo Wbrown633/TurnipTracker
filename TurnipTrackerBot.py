@@ -149,15 +149,19 @@ async def save_data(t: TurnipPrice):
     await save_data_google_sheets(t)
     if t.user != t.author:
         await t.channel.send(
-            f"Thanks, {t.author}! Your turnip price has been saved as user\
-            {t.user}! \n**Price** : {t.price} \t**Period**: {t.period}\
-            \t**Date**: {t.date}"
+            (
+                f"Thanks, {t.author}! Your turnip price has been saved as user"
+                f"{t.user}! \n**Price** : {t.price} \t**Period**: {t.period}"
+                f"\t**Date**: {t.date}"
+            )
         )
     else:
         await t.channel.send(
-            f"Thanks, {t.author}! Your turnip price has been saved!\
-            \n**Price** : {t.price} \t**Period**: {t.period}\
-            \t**Date**: {t.date}"
+            (
+                f"Thanks, {t.author}! Your turnip price has been saved!"
+                f"\n**Price** : {t.price} \t**Period**: {t.period}"
+                f"\t**Date**: {t.date}"
+            )
         )
     await react_to_complete_message(t.message)
     return t
