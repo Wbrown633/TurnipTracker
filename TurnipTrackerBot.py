@@ -71,14 +71,14 @@ def extract_price(string):
 
 
 def extract_period(string):
-    if " am " in string or " am" in string:
-        return "AM"
-    elif " pm " in string or " pm" in string:
-        return "PM"
-    else:
-        return datetime.datetime.today().strftime(
-            "%p"
-        )  # if the user doesn't specify assume the current period
+    try:
+        period = re.findall(r" am | am| pm | pm", string)
+        period = period[0]
+        value = period.replace(" ", "")
+        return value.upper()
+    except:
+        # if the user doesn't specify assume the current period
+        return datetime.datetime.today().strftime("%p")
 
 
 # This method is triggered when we log in.
