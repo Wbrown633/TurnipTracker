@@ -129,7 +129,7 @@ async def parse_message(message):
         await t.channel.send("Sheet set to sheet1.")
         return t
     elif args.log:
-        find_entry(t)
+        print(find_entry(t))
         return t
     # If we haven't broken by now we're a normal price
     await save_data(t)
@@ -242,21 +242,11 @@ def find_entry(turnip: TurnipPrice):
     print(f"Listing values for user: {turnip.user}")
     for row in all_values:
         if row[0].lower() == turnip.user.lower():
-            print(row)
+            return row
 
 
 def make_greeting():
     pass
-
-
-# Remind users to buy Turnips on Sunday
-@client.event
-async def sunday_reminder(message):
-    if datetime.date.day == "Sunday":
-        await message.channel.send(
-            "@here Good Morning Turnip fans, get out there and buy some\
-            Turnips!"
-        )
 
 
 # After we have saved the data given in a user's message, react to it to
