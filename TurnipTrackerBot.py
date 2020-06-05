@@ -241,7 +241,12 @@ def find_entry(turnip: TurnipPrice):
     all_values = sheet.get_all_values()
     print(f"Listing values for user: {turnip.user}")
     for row in all_values:
-        if row[0].lower() == turnip.user.lower():
+        if (
+            row[0].lower() == turnip.user.lower()
+            and row[1] == turnip.price
+            and row[2] == turnip.period
+            and row[3] == turnip.date
+        ):
             return row
 
 
