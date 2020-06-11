@@ -37,16 +37,18 @@ class TurnipPrice:
     date: str
     user: str
     flags: list
+    args: list
 
-    def __init__(self, message):
+    def __init__(self, message, args):
         self.message = message
         self.channel = message.channel
         self.author = message.author.name
         self.string = message.content.lower()
         self.price = extract_price(self.string)
-        self.period = extract_period(self.string)
+        self.period = extract_period(args)
         self.date = extract_date(self.string)
         self.user = message.author.name
+        self.args = args
 
     def make_row(self):
         return [str(self.user), str(self.price), str(self.period), str(self.date)]
@@ -70,9 +72,10 @@ def extract_price(string):
         return None
 
 
-def extract_period(string):
+def extract_period(args):
+    print(args.price)
     try:
-        period = re.findall(r" am | am| pm | pm", string)
+        period = re.findall(r" am | am| pm | pm", args.price)
         period = period[0]
         value = period.replace(" ", "")
         return value.upper()
@@ -100,8 +103,8 @@ async def on_message(message):
 # First of a few helper methods to parse messages posted in the server
 async def parse_message(message):
     message_str = message.content.lower()
-    t = TurnipPrice(message)
     args = parse_args(message_str.split(" "))
+    t = TurnipPrice(message, args)
     if "help" in message_str:
         await t.channel.send(
             "Thanks for asking! Please submit turnip requests using the"
