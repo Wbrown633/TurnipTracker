@@ -44,7 +44,7 @@ class TurnipPrice:
         self.author = message.author.name
         self.string = message.content.lower()
         self.price = extract_price(self.string)
-        self.period = extract_period(args.price)
+        self.period = extract_period(args.price)  # list of strings
         self.date = extract_date(self.string)
         self.user = message.author.name
         self.args = args
@@ -55,7 +55,7 @@ class TurnipPrice:
 
 # helper method using regex to extract the date from a given string. Date must
 # have a '/' seperating month, date, and year
-def extract_date(string):
+def extract_date(string: str):
     try:
         date = re.findall(r"\d+/\d+/\d+|\d+/\d+", string)[0]
         return date
@@ -63,7 +63,7 @@ def extract_date(string):
         return datetime.date.today().strftime("%m/%d/%y")
 
 
-def extract_price(string):
+def extract_price(string: str):
     try:
         price = re.findall(r"( \d+ | \d+$)", string)[0]
         return int(price)
@@ -71,7 +71,7 @@ def extract_price(string):
         return None
 
 
-def extract_period(args):
+def extract_period(args: list):
     if "am" in args:
         return "AM"
     elif "pm" in args:
