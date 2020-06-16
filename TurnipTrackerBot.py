@@ -1,4 +1,4 @@
-# Turniphead's Trunip tracker
+# Turniphead's Turnip tracker
 
 import discord
 import re
