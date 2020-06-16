@@ -27,6 +27,14 @@ class StringParsingTest(unittest.TestCase):
         test_string = "$turnip 50 am pm"
         self.assertEqual(extract_period(test_string), "AM")
 
+    def test_with_user(self):
+        test_user = "$turnip 89 am --user AlanWho"
+        self.assertEqual(extract_period(test_user), "AM")
+
+    def test_alan_bug(self):
+        alan_string = "$turnip am 89"
+        self.assertEqual(extract_period(alan_string), "AM")
+
     ##################### PRICE TESTS #####################
     def test_end_price(self):
         test_string = "$turnip 50 am"

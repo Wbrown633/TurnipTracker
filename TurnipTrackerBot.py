@@ -36,7 +36,6 @@ class TurnipPrice:
     period: str
     date: str
     user: str
-    flags: list
     args: list
 
     def __init__(self, message, args):
@@ -45,7 +44,7 @@ class TurnipPrice:
         self.author = message.author.name
         self.string = message.content.lower()
         self.price = extract_price(self.string)
-        self.period = extract_period(args)
+        self.period = extract_period(args.price)
         self.date = extract_date(self.string)
         self.user = message.author.name
         self.args = args
@@ -73,14 +72,13 @@ def extract_price(string):
 
 
 def extract_period(args):
-    print(args.price)
-    try:
-        period = re.findall(r" am | am| pm | pm", args.price)
-        period = period[0]
-        value = period.replace(" ", "")
-        return value.upper()
-    except:
+    if "am" in args:
+        return "AM"
+    elif "pm" in args:
+        return "PM"
+    else:
         # if the user doesn't specify assume the current period
+        print("No period, using current")
         return datetime.datetime.today().strftime("%p")
 
 
@@ -139,16 +137,10 @@ async def parse_message(message):
     return t
 
 
-# After parsing the message use this helper method to save the data to the
-# dictionary which lives in memory and the google sheet
-async def save_data_local(turnip_price: TurnipPrice):
-    list_of_turnip_prices.append(turnip_price)
-
-
 async def save_data(t: TurnipPrice):
     if t.price == None:
+        print("There was no price exiting")
         return t
-    await save_data_local(t)
     await save_data_google_sheets(t)
     if t.user != t.author:
         await t.channel.send(
