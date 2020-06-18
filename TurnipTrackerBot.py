@@ -130,6 +130,7 @@ async def parse_message(message):
         await t.channel.send("Sheet set to sheet1.")
         return t
     elif args.log:
+        find_log(t)
         print(find_entry(t))
         return t
     # If we haven't broken by now we're a normal price
@@ -243,6 +244,25 @@ def find_entry(turnip: TurnipPrice):
             and row[3] == turnip.date
         ):
             return row
+
+        else:
+            print("Could not find a value matching those criteria.")
+
+
+def find_log(turnip: TurnipPrice):
+    all_values = sheet.get_all_values()
+    print(f"Listing values for user: {turnip.user}")
+    for row in all_values:
+        if (
+            row[0].lower() == turnip.user.lower()
+            and (row[1] == turnip.price or turnip.price == None)
+            and (row[2] == turnip.period or turnip.period == None)
+            and (row[3] == turnip.date or turnip.date == None)
+        ):
+            return row
+
+        else:
+            print(f"No values found for user {turnip.user}.")
 
 
 def make_greeting():
