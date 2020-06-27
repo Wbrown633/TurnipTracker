@@ -9,6 +9,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 from dataclasses import dataclass
 import argparse
 
+
 client = discord.Client()
 
 directory = os.getcwd()
@@ -21,7 +22,8 @@ creds = ServiceAccountCredentials.from_json_keyfile_name(
 )
 gclient = gspread.authorize(creds)
 list_of_turnip_prices = []
-sheet = gclient.open("Turniphead's Turnip Tracker").sheet1
+spreadhseet = gclient.open("Turniphead's Turnip Tracker")
+worksheet = spreadhseet.sheet1
 
 
 @dataclass
@@ -121,12 +123,12 @@ async def parse_message(message):
         await delete_entry(t)
         return t
     elif args.debug:
-        global sheet
-        sheet = gclient.open("Turniphead's Turnip Tracker").worksheet("debug")
+        global worksheet
+        worksheet = gclient.open("Turniphead's Turnip Tracker").worksheet("debug")
         await t.channel.send("Sheet set to debug sheet.")
         return t
     elif args.master:
-        sheet = gclient.open("Turniphead's Turnip Tracker").sheet1
+        worksheet = gclient.open("Turniphead's Turnip Tracker").sheet1
         await t.channel.send("Sheet set to sheet1.")
         return t
     elif args.log:
@@ -213,7 +215,8 @@ def parse_args(message_string):
 async def save_data_google_sheets(turnip_price: TurnipPrice):
     open_row = 2
     row = turnip_price.make_row()
-    sheet.insert_row(row, open_row)
+    print(worksheet)
+    worksheet.insert_row(row, open_row)
 
 
 # Still to be implemented
@@ -233,7 +236,7 @@ async def delete_entry(turnip: TurnipPrice):
 
 
 def find_entry(turnip: TurnipPrice):
-    all_values = sheet.get_all_values()
+    all_values = worksheet.get_all_values()
     print(f"Listing values for user: {turnip.user}")
     for row in all_values:
         if (
@@ -249,11 +252,14 @@ def find_entry(turnip: TurnipPrice):
 
 
 def find_log(turnip: TurnipPrice):
-    all_values = sheet.get_all_values()
+    all_values = worksheet.get_all_values()
     print(f"Listing values for user: {turnip.user}")
     found_values = []
+    # Return only the values from this week
+    today_date = datetime.today()
     for row in all_values:
         if row[0].lower() == turnip.user.lower():
+            entry_date_list = row[3].split("/")
             found_values.append(row)
 
     if len(found_values) > 0:
